@@ -18,8 +18,9 @@ instance Monoid Percentage where
     mempty = Percentage 0 0
     mappend (Percentage nL dL) (Percentage nR dR) = Percentage (nL + nR) (dL + dR)
 
-main = interact $ format . maximumBy (compare `on` snd) . map (second (getPercentage . foldMap percentage . filter isAlpha) . break isSpace) . wordsBy (=='>') where
-    percentage = flip Percentage 1 . fromBool . flip elem "GC"
-    getPercentage (Percentage numerator 0) = 0
-    getPercentage (Percentage numerator denominator) = 100.0 * (fromIntegral numerator) / (fromIntegral denominator)
+main = interact $ format . maximumBy (compare `on` snd) . map processItem . wordsBy (=='>') where
+    processItem = second (getPercentage . foldMap percentage . filter isAlpha) . break isSpace where
+        percentage = flip Percentage 1 . fromBool . flip elem "GC"
+        getPercentage (Percentage numerator 0) = 0
+        getPercentage (Percentage numerator denominator) = 100.0 * (fromIntegral numerator) / (fromIntegral denominator)
     format = uncurry ((<>) . flip (<>) "\n") . second show
